@@ -20,13 +20,16 @@ func main() {
 
 	api := app.Group("/api/roster")
 
-	app.Static("/", "./dist")
-
 	api.Get("/get", middleware.GetAllRoster)
 	api.Get("/get/:date", middleware.GetRoster)
 	api.Post("/insert", middleware.CreateRoster)
 	api.Put("/update/:date", middleware.UpdateRoster)
 	api.Delete("/delete/:date", middleware.DeleteRoster)
+
+	app.Static("/", "dist")
+	app.Get("/*", func(c *fiber.Ctx) {
+		c.SendFile("dist/index.html")
+	})
 
 	Port := os.Getenv("PORT")
 	if Port == "" {
