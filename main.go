@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"roster-api/middleware"
 
 	"github.com/gofiber/cors"
@@ -27,5 +28,10 @@ func main() {
 	api.Put("/update/:date", middleware.UpdateRoster)
 	api.Delete("/delete/:date", middleware.DeleteRoster)
 
-	app.Listen(3000)
+	Port := os.Getenv("PORT")
+	if Port == "" {
+		Port = "8000"
+	}
+
+	app.Listen(Port)
 }
