@@ -16,7 +16,6 @@ import (
 	// used to get the params from the route
 
 	"github.com/gofiber/fiber"
-	"github.com/joho/godotenv"
 
 	// db driver
 	_ "github.com/lib/pq"
@@ -188,6 +187,7 @@ func getAllRosters() ([]models.DayRoster, error) {
 			&roster.LowerStaff,
 			&roster.LowerTime,
 			&roster.CustomMessage,
+			&roster.Shop,
 		)
 
 		if err != nil {
@@ -288,6 +288,7 @@ func getRoster(date string) (models.DayRoster, error) {
 		&roster.LowerStaff,
 		&roster.LowerTime,
 		&roster.CustomMessage,
+		&roster.Shop,
 	)
 
 	switch err {
@@ -306,11 +307,9 @@ func getRoster(date string) (models.DayRoster, error) {
 
 // GetAllRoster send all Roster
 func createConnection() *sql.DB {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
+
 	db, err := sql.Open("postgres", os.Getenv("POSTGRES_URL"))
+
 	if err != nil {
 		panic(err)
 	}
