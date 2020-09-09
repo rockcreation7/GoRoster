@@ -187,7 +187,6 @@ func getAllRosters() ([]models.DayRoster, error) {
 			&roster.LowerStaff,
 			&roster.LowerTime,
 			&roster.CustomMessage,
-			&roster.Shop,
 		)
 
 		if err != nil {
@@ -288,7 +287,6 @@ func getRoster(date string) (models.DayRoster, error) {
 		&roster.LowerStaff,
 		&roster.LowerTime,
 		&roster.CustomMessage,
-		&roster.Shop,
 	)
 
 	switch err {
