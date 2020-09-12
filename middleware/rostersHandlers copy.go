@@ -9,16 +9,13 @@ import (
 	"os"
 	"time"
 
-	// used to read the environment variable
+	"roster-api/db"
 	"roster-api/models"
 
 	// package used to covert string into int type
 	// used to get the params from the route
 
 	"github.com/gofiber/fiber"
-
-	// db driver
-	_ "github.com/lib/pq"
 )
 
 type response struct {
@@ -41,6 +38,7 @@ func tableName() string {
 
 // GetAllRoster ...
 func GetAllRoster(c *fiber.Ctx) {
+
 	rosters, err := getAllRosters()
 	if err != nil {
 		log.Fatalf("Unable to get all roster. %v", err)
@@ -142,8 +140,7 @@ func GetRoster(c *fiber.Ctx) {
 
 func insertRoster(Roster *models.DayRoster) (int64, error) {
 
-	db := createConnection()
-	defer db.Close()
+	db := db.Dbconnect
 
 	sqlStatement := `INSERT INTO ` + tableName() + ` (Date, UpperStaff, UpperTime, LowerStaff, LowerTime, CustomMessage) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
 
@@ -167,8 +164,7 @@ func insertRoster(Roster *models.DayRoster) (int64, error) {
 
 func getAllRosters() ([]models.DayRoster, error) {
 	// create the postgres db connection
-	db := createConnection()
-	defer db.Close()
+	db := db.Dbconnect
 
 	today := time.Now()
 	sevenDayLater := today.AddDate(0, 0, 7)
@@ -211,10 +207,7 @@ func getAllRosters() ([]models.DayRoster, error) {
 func updateRoster(date string, roster *models.DayRoster) int64 {
 
 	// create the postgres db connection
-	db := createConnection()
-
-	// close the db connection
-	defer db.Close()
+	db := db.Dbconnect
 
 	// create the update sql query //date
 	sqlStatement := `UPDATE ` + tableName() + ` SET UpperStaff=$2, LowerStaff=$3, UpperTime=$4, LowerTime=$5, CustomMessage=$6 WHERE date=$1`
@@ -242,10 +235,7 @@ func updateRoster(date string, roster *models.DayRoster) int64 {
 func deleteRoster(date string) int64 {
 
 	// create the postgres db connection
-	db := createConnection()
-
-	// close the db connection
-	defer db.Close()
+	db := db.Dbconnect
 
 	// create the delete sql query
 	sqlStatement := `DELETE FROM ` + tableName() + ` WHERE date=$1`
@@ -272,10 +262,7 @@ func deleteRoster(date string) int64 {
 // get one user from the DB by its userid
 func getRoster(date string) (models.DayRoster, error) {
 	// create the postgres db connection
-	db := createConnection()
-
-	// close the db connection
-	defer db.Close()
+	db := db.Dbconnect
 
 	// create a user of models.User type
 	var roster models.DayRoster
@@ -309,20 +296,4 @@ func getRoster(date string) (models.DayRoster, error) {
 
 	// return empty user on error
 	return roster, err
-}
-
-// GetAllRoster send all Roster
-func createConnection() *sql.DB {
-
-	db, err := sql.Open("postgres", os.Getenv("POSTGRES_URL"))
-
-	if err != nil {
-		panic(err)
-	}
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("Successfully connected!")
-	return db
 }
