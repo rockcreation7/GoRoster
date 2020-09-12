@@ -31,6 +31,14 @@ type updateResponse struct {
 	Message string `json:"message,omitempty"`
 }
 
+func tableName() string {
+	tableName := os.Getenv("TABLE")
+	if tableName == "" {
+		tableName = "Rosters"
+	}
+	return tableName
+}
+
 // GetAllRoster ...
 func GetAllRoster(c *fiber.Ctx) {
 	rosters, err := getAllRosters()
@@ -137,7 +145,7 @@ func insertRoster(Roster *models.DayRoster) (int64, error) {
 	db := createConnection()
 	defer db.Close()
 
-	sqlStatement := `INSERT INTO Rosters (Date, UpperStaff, UpperTime, LowerStaff, LowerTime, CustomMessage) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
+	sqlStatement := `INSERT INTO ` + tableName() + ` (Date, UpperStaff, UpperTime, LowerStaff, LowerTime, CustomMessage) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
 
 	// the inserted id will store in this id
 	var id int64
@@ -170,7 +178,7 @@ func getAllRosters() ([]models.DayRoster, error) {
 
 	// SELECT * from Rosters where (date <= '2020-09-09' AND date >= '2020-09-04')
 	var rosters []models.DayRoster
-	sqlStatement := `SELECT * from Rosters where (date <= $1 AND date >= $2)`
+	sqlStatement := `SELECT * from ` + tableName() + ` where (date <= $1 AND date >= $2)`
 	rows, err := db.Query(sqlStatement, sevenDayLater, today)
 	if err != nil {
 		log.Fatalf("Unable to execute the query. %v", err)
@@ -209,7 +217,7 @@ func updateRoster(date string, roster *models.DayRoster) int64 {
 	defer db.Close()
 
 	// create the update sql query //date
-	sqlStatement := `UPDATE rosters SET UpperStaff=$2, LowerStaff=$3, UpperTime=$4, LowerTime=$5, CustomMessage=$6 WHERE date=$1`
+	sqlStatement := `UPDATE ` + tableName() + ` SET UpperStaff=$2, LowerStaff=$3, UpperTime=$4, LowerTime=$5, CustomMessage=$6 WHERE date=$1`
 
 	// execute the sql statement
 	res, err := db.Exec(sqlStatement, date, roster.UpperStaff, roster.LowerStaff, roster.UpperTime, roster.LowerTime, roster.CustomMessage)
@@ -240,7 +248,7 @@ func deleteRoster(date string) int64 {
 	defer db.Close()
 
 	// create the delete sql query
-	sqlStatement := `DELETE FROM rosters WHERE date=$1`
+	sqlStatement := `DELETE FROM ` + tableName() + ` WHERE date=$1`
 
 	// execute the sql statement
 	res, err := db.Exec(sqlStatement, date)
@@ -273,7 +281,7 @@ func getRoster(date string) (models.DayRoster, error) {
 	var roster models.DayRoster
 
 	// create the select sql query
-	sqlStatement := `SELECT * FROM Rosters WHERE date=$1`
+	sqlStatement := `SELECT * FROM ` + tableName() + ` WHERE date=$1`
 
 	// execute the sql statement
 	row := db.QueryRow(sqlStatement, date)
