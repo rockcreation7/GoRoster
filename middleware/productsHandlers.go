@@ -46,13 +46,17 @@ func GetAllProduct(c *fiber.Ctx) {
 // CreateProduct ...
 func CreateProduct(c *fiber.Ctx) {
 
+	fmt.Println("çreate")
+
 	Product := new(models.Product)
 	// Parse body into struct
 	if err := c.BodyParser(Product); err != nil {
+		fmt.Println(err)
 		c.Status(400).Send(err)
 		return
 	}
 
+	fmt.Println("çreate 2")
 	// call insert product function and pass the product
 	insertID, err := insertProduct(Product)
 
@@ -151,14 +155,14 @@ func insertProduct(Product *models.Product) (int64, error) {
 
 	db := db.Dbconnect
 
-	sqlStatement := `INSERT INTO ` + productTableName() + ` (Name, Price, Cost, Qty, Code) VALUES ($1, $2, $3, $4, $5) RETURNING id`
+	sqlStatement := `INSERT INTO ` + productTableName() + ` (Name, Price, Cost, Qty, Code, Catagory, Imgurl) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`
 
 	// the inserted id will store in this id
 	var id int64
 
 	// execute the sql statement
 	// Scan function will save the insert id in the id
-	err := db.QueryRow(sqlStatement, Product.Name, Product.Price, Product.Cost, Product.Qty, Product.Code).Scan(&id)
+	err := db.QueryRow(sqlStatement, Product.Name, Product.Price, Product.Cost, Product.Qty, Product.Code, Product.Catagory, Product.Imgurl).Scan(&id)
 
 	if err != nil {
 		// log.Fatalf("Unable to execute the query. %v", err)
@@ -191,6 +195,8 @@ func getAllProducts() ([]models.Product, error) {
 			&product.Cost,
 			&product.Qty,
 			&product.Code,
+			&product.Catagory,
+			&product.Imgurl,
 		)
 
 		if err != nil {
@@ -210,10 +216,10 @@ func updateProduct(id int, product *models.Product) int64 {
 	db := db.Dbconnect
 
 	// create the update sql query //date
-	sqlStatement := `UPDATE ` + productTableName() + ` SET Name=$1, Price=$2, Cost=$3, Qty=$4, Code=$5 WHERE id=$6`
+	sqlStatement := `UPDATE ` + productTableName() + ` SET Name=$1, Price=$2, Cost=$3, Qty=$4, Code=$5, Catagory=$6, Imgurl=$7 WHERE id=$8`
 
 	// execute the sql statement
-	res, err := db.Exec(sqlStatement, product.Name, product.Price, product.Cost, product.Qty, product.Code, product.ID)
+	res, err := db.Exec(sqlStatement, product.Name, product.Price, product.Cost, product.Qty, product.Code, product.Catagory, product.Imgurl, product.ID)
 
 	if err != nil {
 		log.Fatalf("Unable to execute the query. %v", err)
@@ -281,6 +287,8 @@ func getProduct(id int) (models.Product, error) {
 		&product.Cost,
 		&product.Qty,
 		&product.Code,
+		&product.Catagory,
+		&product.Imgurl,
 	)
 
 	switch err {
