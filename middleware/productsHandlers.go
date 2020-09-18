@@ -274,10 +274,10 @@ func getProduct(id int) (models.Product, error) {
 	var product models.Product
 
 	// create the select sql query
-	sqlStatement := `SELECT * FROM ` + productTableName()
+	sqlStatement := `SELECT * FROM ` + productTableName() + ` WHERE id=$1`
 
 	// execute the sql statement
-	row := db.QueryRow(sqlStatement)
+	row := db.QueryRow(sqlStatement, id)
 
 	// unmarshal the row object to user
 	err := row.Scan(
