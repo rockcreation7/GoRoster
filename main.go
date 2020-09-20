@@ -7,8 +7,9 @@ import (
 	"roster-api/db"
 	"roster-api/router"
 
-	"github.com/gofiber/cors"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	_ "github.com/lib/pq"
 )
 
@@ -21,14 +22,15 @@ func main() {
 	fmt.Println("db connection success")
 
 	app := fiber.New()
-	app.Use(cors.New())
+	app.Use(recover.New())
 
+	app.Use(cors.New())
 	router.Route(app)
 
 	Port := os.Getenv("PORT")
 	if Port == "" {
-		Port = "8000"
+		Port = ":9000"
 	}
 
-	app.Listen(Port)
+	log.Fatal(app.Listen(Port))
 }

@@ -3,7 +3,7 @@ package router
 import (
 	"roster-api/middleware"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 // Route export to main
@@ -25,7 +25,8 @@ func Route(app *fiber.App) {
 	productAPI.Delete("/delete/:id", middleware.DeleteProduct)
 
 	app.Static("/", "dist")
-	app.Get("/*", func(c *fiber.Ctx) {
-		c.SendFile("dist/index.html")
+	app.Get("/*", func(c *fiber.Ctx) error {
+		return c.SendFile("./dist/index.html")
 	})
+
 }

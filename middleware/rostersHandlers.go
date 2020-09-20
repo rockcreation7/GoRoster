@@ -15,7 +15,7 @@ import (
 	// package used to covert string into int type
 	// used to get the params from the route
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 type response struct {
@@ -37,7 +37,7 @@ func tableName() string {
 }
 
 // GetAllRoster ...
-func GetAllRoster(c *fiber.Ctx) {
+func GetAllRoster(c *fiber.Ctx) error {
 
 	rosters, err := getAllRosters()
 	if err != nil {
@@ -45,25 +45,23 @@ func GetAllRoster(c *fiber.Ctx) {
 	}
 
 	fmt.Println(err)
-	c.JSON(rosters)
+	return c.JSON(rosters)
 }
 
 // CreateRoster ...
-func CreateRoster(c *fiber.Ctx) {
+func CreateRoster(c *fiber.Ctx) error {
 
 	Roster := new(models.DayRoster)
 	// Parse body into struct
 	if err := c.BodyParser(Roster); err != nil {
-		c.Status(400).Send(err)
-		return
+		return err
 	}
 
 	// call insert roster function and pass the roster
 	insertID, err := insertRoster(Roster)
 
 	if err != nil {
-		c.JSON(err)
-		return
+		return c.JSON(err)
 	}
 
 	// format a response object
@@ -73,17 +71,16 @@ func CreateRoster(c *fiber.Ctx) {
 	}
 
 	// send the response
-	c.JSON(res)
+	return c.JSON(res)
 }
 
 // UpdateRoster update roster's detail in the postgres db
-func UpdateRoster(c *fiber.Ctx) {
+func UpdateRoster(c *fiber.Ctx) error {
 
 	Roster := new(models.DayRoster)
 	// Parse body into struct
 	if err := c.BodyParser(Roster); err != nil {
-		c.Status(400).Send(err)
-		return
+		return err
 	}
 	date := c.Params("date")
 	updatedRows := updateRoster(date, Roster)
@@ -98,11 +95,11 @@ func UpdateRoster(c *fiber.Ctx) {
 	}
 
 	// send the response
-	c.JSON(res)
+	return c.JSON(res)
 }
 
 // DeleteRoster delete roster's detail in the postgres db
-func DeleteRoster(c *fiber.Ctx) {
+func DeleteRoster(c *fiber.Ctx) error {
 
 	// call the deleteRoster
 
@@ -118,11 +115,11 @@ func DeleteRoster(c *fiber.Ctx) {
 		Message: msg,
 	}
 
-	c.JSON(res)
+	return c.JSON(res)
 }
 
 // GetRoster get roster by date
-func GetRoster(c *fiber.Ctx) {
+func GetRoster(c *fiber.Ctx) error {
 
 	date := c.Params("date")
 	// convert the id type from string to int
@@ -130,10 +127,10 @@ func GetRoster(c *fiber.Ctx) {
 	roster, err := getRoster(date)
 
 	if err != nil {
-		log.Fatalf("Unable to get user. %v", err)
+		return err
 	}
 
-	c.JSON(roster)
+	return c.JSON(roster)
 }
 
 //------------------------- handler functions ----------------

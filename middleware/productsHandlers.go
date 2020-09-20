@@ -12,10 +12,9 @@ import (
 	"roster-api/db"
 	"roster-api/models"
 
+	"github.com/gofiber/fiber/v2"
 	// package used to covert string into int type
 	// used to get the params from the route
-
-	"github.com/gofiber/fiber"
 )
 
 type updateProductResponse struct {
@@ -32,28 +31,27 @@ func productTableName() string {
 }
 
 // GetAllProduct ...
-func GetAllProduct(c *fiber.Ctx) {
+func GetAllProduct(c *fiber.Ctx) error {
 
 	products, err := getAllProducts()
 	if err != nil {
 		log.Fatalf("Unable to get all product. %v", err)
+		// fiber will return err response?
+		return err
 	}
 
-	fmt.Println(err)
-	c.JSON(products)
+	return c.JSON(products)
 }
 
 // CreateProduct ...
-func CreateProduct(c *fiber.Ctx) {
+func CreateProduct(c *fiber.Ctx) error {
 
 	fmt.Println("çreate")
 
 	Product := new(models.Product)
 	// Parse body into struct
 	if err := c.BodyParser(Product); err != nil {
-		fmt.Println(err)
-		c.Status(400).Send(err)
-		return
+		return err
 	}
 
 	fmt.Println("çreate 2")
@@ -61,8 +59,7 @@ func CreateProduct(c *fiber.Ctx) {
 	insertID, err := insertProduct(Product)
 
 	if err != nil {
-		c.JSON(err)
-		return
+		return c.JSON(err)
 	}
 
 	// format a response object
@@ -72,17 +69,16 @@ func CreateProduct(c *fiber.Ctx) {
 	}
 
 	// send the response
-	c.JSON(res)
+	return c.JSON(res)
 }
 
 // UpdateProduct update product's detail in the postgres db
-func UpdateProduct(c *fiber.Ctx) {
+func UpdateProduct(c *fiber.Ctx) error {
 
 	Product := new(models.Product)
 	// Parse body into struct
 	if err := c.BodyParser(Product); err != nil {
-		c.Status(400).Send(err)
-		return
+		return err
 	}
 
 	id, err := strconv.Atoi(c.Params("id"))
@@ -102,11 +98,11 @@ func UpdateProduct(c *fiber.Ctx) {
 	}
 
 	// send the response
-	c.JSON(res)
+	return c.JSON(res)
 }
 
 // DeleteProduct delete product's detail in the postgres db
-func DeleteProduct(c *fiber.Ctx) {
+func DeleteProduct(c *fiber.Ctx) error {
 
 	// call the deleteProduct
 
@@ -127,11 +123,11 @@ func DeleteProduct(c *fiber.Ctx) {
 		Message: msg,
 	}
 
-	c.JSON(res)
+	return c.JSON(res)
 }
 
 // GetProduct get product by date
-func GetProduct(c *fiber.Ctx) {
+func GetProduct(c *fiber.Ctx) error {
 	// convert the id type from string to int
 
 	id, err := strconv.Atoi(c.Params("id"))
@@ -146,7 +142,7 @@ func GetProduct(c *fiber.Ctx) {
 		log.Fatalf("Unable to get user. %v", err)
 	}
 
-	c.JSON(product)
+	return c.JSON(product)
 }
 
 //------------------------- handler functions ----------------
