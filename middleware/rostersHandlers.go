@@ -41,7 +41,7 @@ func GetAllRoster(c *fiber.Ctx) error {
 
 	rosters, err := getAllRosters()
 	if err != nil {
-		log.Fatalf("Unable to get all roster. %v", err)
+		log.Fatalf("Unable to get all roster . %v", err)
 	}
 
 	fmt.Println(err)
