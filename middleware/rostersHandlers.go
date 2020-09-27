@@ -84,7 +84,7 @@ func UpdateRoster(c *fiber.Ctx) error {
 	}
 	date := c.Params("date")
 	updatedRows := updateRoster(date, Roster)
-
+	// error on invalidate input
 	// format the message string
 	msg := fmt.Sprintf("Roster updated successfully. Total rows/record affected %v", updatedRows)
 
