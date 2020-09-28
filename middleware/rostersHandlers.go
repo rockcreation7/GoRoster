@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"log" // used to access the request and response object of the api
+	// used to access the request and response object of the api
 	"os"
 	"time"
 
@@ -41,7 +41,7 @@ func GetAllRoster(c *fiber.Ctx) error {
 
 	rosters, err := getAllRosters()
 	if err != nil {
-		log.Fatalf("Unable to get all roster . %v", err)
+		panic("Unable to get all roster . %v")
 	}
 
 	fmt.Println(err)
@@ -54,14 +54,14 @@ func CreateRoster(c *fiber.Ctx) error {
 	Roster := new(models.DayRoster)
 	// Parse body into struct
 	if err := c.BodyParser(Roster); err != nil {
-		return err
+		panic("error on pause body")
 	}
 
 	// call insert roster function and pass the roster
 	insertID, err := insertRoster(Roster)
 
 	if err != nil {
-		return c.JSON(err)
+		panic("error on insert roster")
 	}
 
 	// format a response object
@@ -80,7 +80,7 @@ func UpdateRoster(c *fiber.Ctx) error {
 	Roster := new(models.DayRoster)
 	// Parse body into struct
 	if err := c.BodyParser(Roster); err != nil {
-		return err
+		panic("error Parse body into struct")
 	}
 	date := c.Params("date")
 	updatedRows := updateRoster(date, Roster)
@@ -127,7 +127,7 @@ func GetRoster(c *fiber.Ctx) error {
 	roster, err := getRoster(date)
 
 	if err != nil {
-		return err
+		panic("get Roster err")
 	}
 
 	return c.JSON(roster)
@@ -149,8 +149,7 @@ func insertRoster(Roster *models.DayRoster) (int64, error) {
 	err := db.QueryRow(sqlStatement, Roster.Date, Roster.UpperStaff, Roster.UpperTime, Roster.LowerStaff, Roster.LowerTime, Roster.CustomMessage).Scan(&id)
 
 	if err != nil {
-		// log.Fatalf("Unable to execute the query. %v", err)
-		fmt.Printf("Unable to execute the query. %v", err)
+		panic("Unable to execute the query. %v")
 	}
 
 	fmt.Printf("Inserted a single record %v", id)
@@ -174,7 +173,7 @@ func getAllRosters() ([]models.DayRoster, error) {
 	sqlStatement := `SELECT * from ` + tableName() + ` where (date <= $1 AND date >= $2)`
 	rows, err := db.Query(sqlStatement, sevenDayLater, today)
 	if err != nil {
-		log.Fatalf("Unable to execute the query. %v", err)
+		panic("Unable to execute the query. %v")
 	}
 	defer rows.Close()
 
@@ -191,7 +190,7 @@ func getAllRosters() ([]models.DayRoster, error) {
 		)
 
 		if err != nil {
-			log.Fatalf("Unable to scan the row. %v", err)
+			panic("Unable to scan the row. %v")
 		}
 
 		rosters = append(rosters, roster)
@@ -213,14 +212,14 @@ func updateRoster(date string, roster *models.DayRoster) int64 {
 	res, err := db.Exec(sqlStatement, date, roster.UpperStaff, roster.LowerStaff, roster.UpperTime, roster.LowerTime, roster.CustomMessage)
 
 	if err != nil {
-		log.Fatalf("Unable to execute the query. %v", err)
+		panic(err)
 	}
 
 	// check how many rows affected
 	rowsAffected, err := res.RowsAffected()
 
 	if err != nil {
-		log.Fatalf("Error while checking the affected rows. %v", err)
+		panic(err)
 	}
 
 	fmt.Printf("Total rows/record affected %v", rowsAffected)
@@ -241,14 +240,14 @@ func deleteRoster(date string) int64 {
 	res, err := db.Exec(sqlStatement, date)
 
 	if err != nil {
-		log.Fatalf("Unable to execute the query. %v", err)
+		panic("Unable to execute the query. %v")
 	}
 
 	// check how many rows affected
 	rowsAffected, err := res.RowsAffected()
 
 	if err != nil {
-		log.Fatalf("Error while checking the affected rows. %v", err)
+		panic("Error while checking the affected rows. %v")
 	}
 
 	fmt.Printf("Total rows/record affected %v", rowsAffected)
@@ -283,14 +282,11 @@ func getRoster(date string) (models.DayRoster, error) {
 
 	switch err {
 	case sql.ErrNoRows:
-		fmt.Println("No rows were returned!")
-		return roster, nil
+		panic("No rows were returned!")
 	case nil:
 		return roster, nil
 	default:
-		log.Printf("Unable to scan the row. %v", err)
+		panic("Unable to scan the row. %v")
 	}
 
-	// return empty user on error
-	return roster, err
 }

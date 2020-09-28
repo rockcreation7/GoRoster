@@ -7,7 +7,7 @@ import (
 	"os"
 	"strconv"
 
-	"log" // used to access the request and response object of the api
+	// used to access the request and response object of the api
 
 	"roster-api/db"
 	"roster-api/models"
@@ -35,7 +35,7 @@ func GetAllProduct(c *fiber.Ctx) error {
 
 	products, err := getAllProducts()
 	if err != nil {
-		log.Fatalf("Unable to get all product. %v", err)
+		panic("Unable to get all product. %v")
 		// fiber will return err response?
 		return err
 	}
@@ -51,15 +51,14 @@ func CreateProduct(c *fiber.Ctx) error {
 	Product := new(models.Product)
 	// Parse body into struct
 	if err := c.BodyParser(Product); err != nil {
-		return err
+		panic("err on creating product")
 	}
 
-	fmt.Println("çreate 2")
 	// call insert product function and pass the product
 	insertID, err := insertProduct(Product)
 
 	if err != nil {
-		return c.JSON(err)
+		panic("err on creating product")
 	}
 
 	// format a response object
@@ -78,13 +77,13 @@ func UpdateProduct(c *fiber.Ctx) error {
 	Product := new(models.Product)
 	// Parse body into struct
 	if err := c.BodyParser(Product); err != nil {
-		return err
+		panic("error on pauseing body")
 	}
 
 	id, err := strconv.Atoi(c.Params("id"))
 
 	if err != nil {
-		log.Fatalf("Unable to convert the string into int.  %v", err)
+		panic("Unable to convert the string into int.  %v")
 	}
 	updatedRows := updateProduct(id, Product)
 
@@ -109,7 +108,7 @@ func DeleteProduct(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 
 	if err != nil {
-		log.Fatalf("Unable to convert the string into int.  %v", err)
+		panic("Unable to convert the string into int.  %v")
 	}
 
 	deletedRows := deleteProduct(id)
@@ -133,13 +132,13 @@ func GetProduct(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 
 	if err != nil {
-		log.Fatalf("Unable to convert the string into int.  %v", err)
+		panic("Unable to convert the string into int.  %v")
 	}
 
 	product, err := getProduct(id)
 
 	if err != nil {
-		log.Fatalf("Unable to get user. %v", err)
+		panic("Unable to get user. %v")
 	}
 
 	return c.JSON(product)
@@ -162,11 +161,8 @@ func insertProduct(Product *models.Product) (int64, error) {
 
 	if err != nil {
 		// log.Fatalf("Unable to execute the query. %v", err)
-		fmt.Printf("Unable to execute the query. %v", err)
+		panic("Unable to execute the query. %v")
 	}
-
-	fmt.Printf("Inserted a single record %v", id)
-
 	// return the inserted id
 	return id, err
 }
@@ -178,7 +174,7 @@ func getAllProducts() ([]models.Product, error) {
 	sqlStatement := `SELECT * from ` + productTableName()
 	rows, err := db.Query(sqlStatement)
 	if err != nil {
-		log.Fatalf("Unable to execute the query. %v", err)
+		panic("Unable to execute the query. %v")
 	}
 	defer rows.Close()
 
@@ -196,7 +192,7 @@ func getAllProducts() ([]models.Product, error) {
 		)
 
 		if err != nil {
-			log.Fatalf("Unable to scan the row. %v", err)
+			panic("Unable to scan the row. %v")
 		}
 
 		products = append(products, product)
@@ -218,14 +214,14 @@ func updateProduct(id int, product *models.Product) int64 {
 	res, err := db.Exec(sqlStatement, product.Name, product.Price, product.Cost, product.Qty, product.Code, product.Catagory, product.Imgurl, product.ID)
 
 	if err != nil {
-		log.Fatalf("Unable to execute the query. %v", err)
+		panic("Unable to execute the query. %v")
 	}
 
 	// check how many rows affected
 	rowsAffected, err := res.RowsAffected()
 
 	if err != nil {
-		log.Fatalf("Error while checking the affected rows. %v", err)
+		panic("Error while checking the affected rows. %v")
 	}
 
 	fmt.Printf("Total rows/record affected %v", rowsAffected)
@@ -246,17 +242,15 @@ func deleteProduct(id int) int64 {
 	res, err := db.Exec(sqlStatement, id)
 
 	if err != nil {
-		log.Fatalf("Unable to execute the query. %v", err)
+		panic("Unable to execute the query. %v")
 	}
 
 	// check how many rows affected
 	rowsAffected, err := res.RowsAffected()
 
 	if err != nil {
-		log.Fatalf("Error while checking the affected rows. %v", err)
+		panic("Error while checking the affected rows. %v")
 	}
-
-	fmt.Printf("Total rows/record affected %v", rowsAffected)
 
 	return rowsAffected
 }
@@ -289,14 +283,10 @@ func getProduct(id int) (models.Product, error) {
 
 	switch err {
 	case sql.ErrNoRows:
-		fmt.Println("No rows were returned!")
-		return product, nil
+		panic("No rows were returned!")
 	case nil:
 		return product, nil
 	default:
-		log.Printf("Unable to scan the row. %v", err)
+		panic("Unable to scan the row. %v")
 	}
-
-	// return empty user on error
-	return product, err
 }
