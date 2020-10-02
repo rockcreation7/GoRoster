@@ -27,7 +27,7 @@ func main() {
 	app.Use(cors.New())
 	router.Route(app)
 
-	Port := os.Getenv("PORT")
+	Port := ":" + os.Getenv("PORT")
 	if Port == "" {
 		Port = ":9000"
 	}
