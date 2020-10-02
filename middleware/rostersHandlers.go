@@ -168,7 +168,7 @@ func getAllRosters() ([]models.DayRoster, error) {
 	db := db.Dbconnect
 
 	today := time.Now()
-	sevenDayLater := today.AddDate(0, 0, 7)
+	sevenDayLater := today.AddDate(0, 0, 14)
 
 	fmt.Println(today)
 	fmt.Println(sevenDayLater)

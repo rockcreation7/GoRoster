@@ -35,9 +35,7 @@ func GetAllProduct(c *fiber.Ctx) error {
 
 	products, err := getAllProducts()
 	if err != nil {
-		panic("Unable to get all product. %v")
-		// fiber will return err response?
-		return err
+		panic(err)
 	}
 
 	return c.JSON(products)
