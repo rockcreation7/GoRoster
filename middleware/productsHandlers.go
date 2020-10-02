@@ -161,7 +161,7 @@ func insertProduct(Product *models.Product) (int64, error) {
 
 	if err != nil {
 		// log.Fatalf("Unable to execute the query. %v", err)
-		panic("Unable to execute the query. %v")
+		panic(err)
 	}
 	// return the inserted id
 	return id, err

@@ -4,6 +4,7 @@ import (
 	// package to encode and decode the json into struct and vice versa
 	"database/sql"
 	"fmt"
+	"sort"
 
 	// used to access the request and response object of the api
 	"os"
@@ -43,6 +44,10 @@ func GetAllRoster(c *fiber.Ctx) error {
 	if err != nil {
 		panic("Unable to get all roster . %v")
 	}
+
+	sort.SliceStable(rosters, func(i, j int) bool {
+		return rosters[i].Date < rosters[j].Date
+	})
 
 	fmt.Println(err)
 	return c.JSON(rosters)
