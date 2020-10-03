@@ -27,10 +27,13 @@ func main() {
 	app.Use(cors.New())
 	router.Route(app)
 
-	Port := ":" + os.Getenv("PORT")
+	Port := os.Getenv("PORT")
 	if Port == "" {
-		Port = ":9000"
+		Port = "9000"
 	}
 
-	log.Fatal(app.Listen(Port))
+	log.Fatal(app.Listen(":" + Port))
 }
+
+// live-reload
+// https://techinscribed.com/5-ways-to-live-reloading-go-applications/
