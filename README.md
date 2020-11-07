@@ -1,3 +1,3 @@
 # GoRoster
 
-Duty roster and product total price calcalator
+Duty roster and product total price calculator
