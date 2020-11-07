@@ -16,8 +16,7 @@ type DayRoster struct {
 	CustomMessage string `json:"customMessage,omitempty"`
 }
 
-// Product ...
-
+// Product model for cashier
 type Product struct {
 	ID       int     `json:"id"`
 	Name     string  `json:"name"`
@@ -29,9 +28,8 @@ type Product struct {
 	Imgurl   string  `json:"Imgurl,omitempty"`
 }
 
-// https://blog.auberginesolutions.com/how-i-handled-possible-null-values-from-database-rows-in-golang/
-
 // NullString ...
+// https://blog.auberginesolutions.com/how-i-handled-possible-null-values-from-database-rows-in-golang/
 type NullString struct {
 	sql.NullString
 }
