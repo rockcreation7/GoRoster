@@ -51,6 +51,7 @@ func CreateProduct(c *fiber.Ctx) error {
 	if err := c.BodyParser(Product); err != nil {
 		panic("err on creating product")
 	}
+	fmt.Printf(Product.Name, "Product")
 
 	// call insert product function and pass the product
 	insertID, err := insertProduct(Product)
