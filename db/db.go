@@ -24,7 +24,7 @@ func Connect() error {
 	}
 
 	Dbconnect, err = sql.Open("postgres", os.Getenv("POSTGRES_URL"))
-	mirgrate(Dbconnect)
+	migrate(Dbconnect)
 
 	if err != nil {
 		panic(err)
@@ -38,7 +38,7 @@ func Connect() error {
 	return nil
 }
 
-func mirgrate(Dbconnect *sql.DB) {
+func migrate(Dbconnect *sql.DB) {
 	var err error
 	// execute the sql statement
 	var stmt *sql.Stmt
