@@ -213,7 +213,7 @@ func updateProduct(id int, product *models.Product) int64 {
 	res, err := db.Exec(sqlStatement, product.Name, product.Price, product.Cost, product.Qty, product.Code, product.Catagory, product.Imgurl, product.ID)
 
 	if err != nil {
-		panic("Unable to execute the query. %v")
+		panic("Unable to execute the query.")
 	}
 
 	// check how many rows affected

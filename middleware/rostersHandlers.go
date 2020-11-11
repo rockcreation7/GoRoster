@@ -45,6 +45,8 @@ func GetAllRoster(c *fiber.Ctx) error {
 		panic("Unable to get all roster . %v")
 	}
 
+	// https://yourbasic.org/golang/how-to-sort-in-go/
+
 	sort.SliceStable(rosters, func(i, j int) bool {
 		return rosters[i].Date < rosters[j].Date
 	})
@@ -59,7 +61,7 @@ func CreateRoster(c *fiber.Ctx) error {
 	Roster := new(models.DayRoster)
 	// Parse body into struct
 	if err := c.BodyParser(Roster); err != nil {
-		panic("error on pause body")
+		panic(err)
 	}
 
 	// call insert roster function and pass the roster
@@ -151,10 +153,10 @@ func insertRoster(Roster *models.DayRoster) (int64, error) {
 
 	// execute the sql statement
 	// Scan function will save the insert id in the id
-	err := db.QueryRow(sqlStatement, Roster.Date, Roster.UpperStaff, Roster.UpperTime, Roster.LowerStaff, Roster.LowerTime, Roster.CustomMessage).Scan(&id)
+	err := db.QueryRow(sqlStatement, Roster.Date.Time(), Roster.UpperStaff, Roster.UpperTime, Roster.LowerStaff, Roster.LowerTime, Roster.CustomMessage).Scan(&id)
 
 	if err != nil {
-		panic("Unable to execute the query. %v")
+		panic(err)
 	}
 
 	fmt.Printf("Inserted a single record %v", id)
