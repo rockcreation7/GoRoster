@@ -46,10 +46,13 @@ func (ct *CustomTime) Time() time.Time {
 	return t
 }
 
+// Make it as string
+/*
 func (ct *CustomTime) Time() time.Time {
 	t := time.Time(*ct)
 	return t
 }
+*/
 
 // Product model for cashier
 type Product struct {
