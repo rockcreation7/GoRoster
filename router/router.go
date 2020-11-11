@@ -35,8 +35,8 @@ func Route(app *fiber.App) {
 		return c.SaveFile(file, fmt.Sprintf("./dist/img/%s", file.Filename))
 	})
 
-	app.Static("/", "dist")
-	app.Get("/*", func(c *fiber.Ctx) error {
+	app.Static("/admin", "dist")
+	app.Get("/admin/*", func(c *fiber.Ctx) error {
 		return c.SendFile("./dist/index.html")
 	})
 
