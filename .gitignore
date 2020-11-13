@@ -13,8 +13,11 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
-tmp/build-errors.log
+ 
 *.log
 .env
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 tmp
