@@ -4,7 +4,7 @@ import (
 	// package to encode and decode the json into struct and vice versa
 	"database/sql"
 	"fmt"
-	"sort"
+	"reflect"
 
 	// used to access the request and response object of the api
 	"os"
@@ -29,6 +29,17 @@ type updateResponse struct {
 	Message string `json:"message,omitempty"`
 }
 
+// DayRosterResponse - response format
+type DayRosterResponse struct {
+	ID            int       `json:"id"`
+	Date          time.Time `json:"date"`
+	UpperStaff    string    `json:"upperStaff"`
+	UpperTime     string    `json:"upperTime"`
+	LowerStaff    string    `json:"lowerStaff"`
+	LowerTime     string    `json:"lowerTime"`
+	CustomMessage string    `json:"customMessage"`
+}
+
 func tableName() string {
 	tableName := os.Getenv("TABLE")
 	if tableName == "" {
@@ -45,22 +56,90 @@ func GetAllRoster(c *fiber.Ctx) error {
 		panic("Unable to get all roster . %v")
 	}
 
-	// https://yourbasic.org/golang/how-to-sort-in-go/
+	/* 	sort.SliceStable(rosters, func(i, j int) bool {
+		fmt.Println(rosters[i].Date.String(), "sort")
+		return rosters[i].Date.String() < rosters[j].Date.String()
+	}) */
 
-	sort.SliceStable(rosters, func(i, j int) bool {
-		return rosters[i].Date < rosters[j].Date
-	})
+	var dayRosterResponse []DayRosterResponse
 
-	fmt.Println(err)
-	return c.JSON(rosters)
+	for _, v := range rosters {
+		var ResponseObject DayRosterResponse
+		ResponseObject.Date = v.Date.Time()
+		ResponseObject.ID = v.ID
+		ResponseObject.UpperStaff = v.UpperStaff
+		ResponseObject.UpperTime = v.UpperTime
+		dayRosterResponse = append(dayRosterResponse, ResponseObject)
+	}
+
+	return c.JSON(dayRosterResponse)
 }
 
-// CreateRoster ...
+/*
+// CustomBodyParser - CustomBodyParser
+func (c *Ctx) CustomBodyParser(out interface{}) error {
+
+	fmt.println("here")
+	// Get decoder from pool
+	schemaDecoder := decoderPool.Get().(*schema.Decoder)
+
+	defer decoderPool.Put(schemaDecoder)
+
+	// Get content-type
+	ctype := getString(c.fasthttp.Request.Header.ContentType())
+
+	// Parse body accordingly
+	if strings.HasPrefix(ctype, MIMEApplicationJSON) {
+		schemaDecoder.SetAliasTag("json")
+		return json.Unmarshal(c.fasthttp.Request.Body(), out)
+	} else if strings.HasPrefix(ctype, MIMEApplicationForm) {
+		schemaDecoder.SetAliasTag("form")
+		data := make(map[string][]string)
+		c.fasthttp.PostArgs().VisitAll(func(key []byte, val []byte) {
+			data[getString(key)] = append(data[getString(key)], getString(val))
+		})
+		return schemaDecoder.Decode(out, data)
+	} else if strings.HasPrefix(ctype, MIMEMultipartForm) {
+		schemaDecoder.SetAliasTag("form")
+		data, err := c.fasthttp.MultipartForm()
+		if err != nil {
+			return err
+		}
+		return schemaDecoder.Decode(out, data.Value)
+	} else if strings.HasPrefix(ctype, MIMETextXML) || strings.HasPrefix(ctype, MIMEApplicationXML) {
+		schemaDecoder.SetAliasTag("xml")
+		return xml.Unmarshal(c.fasthttp.Request.Body(), out)
+	}
+	// No suitable content type found
+	return fmt.Errorf("bodyparser: cannot parse content-type: %v", ctype)
+}
+*/
+var timeConverter = func(value string) reflect.Value {
+	if v, err := time.Parse("2006-02-01", value); err == nil {
+		fmt.Println(v, "v  err")
+		return reflect.ValueOf(v)
+	}
+	return reflect.Value{} // this is the same as the private const invalidType
+}
+
+// CreateRoster - insertRoster
 func CreateRoster(c *fiber.Ctx) error {
+
+	confCustomTime := fiber.CustomRegister{
+		models.CustomTime{},
+		timeConverter,
+	}
+
+	confCustomTime2 := fiber.CustomRegister{
+		models.CustomTime2{},
+		timeConverter,
+	}
+
+	confs := []fiber.CustomRegister{confCustomTime2, confCustomTime}
 
 	Roster := new(models.DayRoster)
 	// Parse body into struct
-	if err := c.BodyParser(Roster); err != nil {
+	if err := c.CustomFormParser(Roster, confs); err != nil {
 		panic(err)
 	}
 
@@ -133,11 +212,22 @@ func GetRoster(c *fiber.Ctx) error {
 
 	roster, err := getRoster(date)
 
+	var dayRosterResponse DayRosterResponse
+
+	// https://stackoverflow.com/questions/16248241/concatenate-two-slices-in-go
+	// https://stackoverflow.com/questions/18926303/iterate-through-the-fields-of-a-struct-in-go
+
+	dayRosterResponse.ID = roster.ID
+	dayRosterResponse.Date = roster.Date.Time()
+	dayRosterResponse.UpperStaff = roster.UpperTime
+	dayRosterResponse.UpperTime = roster.UpperTime
+	dayRosterResponse.CustomMessage = roster.CustomMessage
+
 	if err != nil {
 		panic("get Roster err")
 	}
 
-	return c.JSON(roster)
+	return c.JSON(dayRosterResponse)
 }
 
 //------------------------- handler functions ----------------
@@ -153,7 +243,7 @@ func insertRoster(Roster *models.DayRoster) (int64, error) {
 
 	// execute the sql statement
 	// Scan function will save the insert id in the id
-	err := db.QueryRow(sqlStatement, Roster.Date.Time(), Roster.UpperStaff, Roster.UpperTime, Roster.LowerStaff, Roster.LowerTime, Roster.CustomMessage).Scan(&id)
+	err := db.QueryRow(sqlStatement, Roster.Date.String(), Roster.UpperStaff, Roster.UpperTime, Roster.LowerStaff, Roster.LowerTime, Roster.CustomMessage).Scan(&id)
 
 	if err != nil {
 		panic(err)

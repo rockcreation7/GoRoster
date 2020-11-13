@@ -3,12 +3,11 @@ package models
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"strings"
 	"time"
 )
 
-// DayRoster ...
+// DayRoster - format for database
 type DayRoster struct {
 	ID            int        `json:"id"`
 	Date          CustomTime `json:"date"`
@@ -18,6 +17,7 @@ type DayRoster struct {
 	LowerTime     string     `json:"lowerTime,omitempty"`
 	CustomMessage string     `json:"customMessage,omitempty"`
 }
+type CustomTime2 time.Time
 
 // CustomTime - defined
 type CustomTime time.Time
@@ -28,9 +28,7 @@ const ctLayout = "2006-01-02 15:04:05 Z07:00"
 func (ct *CustomTime) UnmarshalJSON(b []byte) (err error) {
 	s := strings.Trim(string(b), `"`)
 	cs := s + ` 00:00:00 Z`
-	fmt.Println(cs, "CustomTime")
 	nt, err := time.Parse(ctLayout, cs)
-	fmt.Println(nt, "NewTime", err)
 	*ct = CustomTime(nt)
 	return
 }
@@ -46,9 +44,9 @@ func (ct *CustomTime) Time() time.Time {
 	return t
 }
 
-func (ct *CustomTime) Time() time.Time {
+func (ct *CustomTime) String() string {
 	t := time.Time(*ct)
-	return t
+	return t.Format(ctLayout)
 }
 
 // Product model for cashier
