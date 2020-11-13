@@ -131,7 +131,7 @@ func CreateRoster(c *fiber.Ctx) error {
 	}
 
 	confCustomTime2 := fiber.CustomRegister{
-		models.CustomTime2{},
+		models.CustomTime{},
 		timeConverter,
 	}
 
@@ -243,7 +243,7 @@ func insertRoster(Roster *models.DayRoster) (int64, error) {
 
 	// execute the sql statement
 	// Scan function will save the insert id in the id
-	err := db.QueryRow(sqlStatement, Roster.Date.String(), Roster.UpperStaff, Roster.UpperTime, Roster.LowerStaff, Roster.LowerTime, Roster.CustomMessage).Scan(&id)
+	err := db.QueryRow(sqlStatement, Roster.Date.Time(), Roster.UpperStaff, Roster.UpperTime, Roster.LowerStaff, Roster.LowerTime, Roster.CustomMessage).Scan(&id)
 
 	if err != nil {
 		panic(err)
