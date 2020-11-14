@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	// Dbconnect export for global
+	// Dbconnect - datebase connection export for global, for big development/team may consider the depend injection
 	Dbconnect *sql.DB
 )
 
