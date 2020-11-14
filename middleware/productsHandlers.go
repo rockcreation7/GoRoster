@@ -12,7 +12,7 @@ import (
 	"roster-api/db"
 	"roster-api/models"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/rockcreation7/fiber/v2"
 	// package used to covert string into int type
 	// used to get the params from the route
 )
@@ -51,6 +51,7 @@ func CreateProduct(c *fiber.Ctx) error {
 	if err := c.BodyParser(Product); err != nil {
 		panic("err on creating product")
 	}
+	fmt.Printf(Product.Name, "Product")
 
 	// call insert product function and pass the product
 	insertID, err := insertProduct(Product)
@@ -212,7 +213,7 @@ func updateProduct(id int, product *models.Product) int64 {
 	res, err := db.Exec(sqlStatement, product.Name, product.Price, product.Cost, product.Qty, product.Code, product.Catagory, product.Imgurl, product.ID)
 
 	if err != nil {
-		panic("Unable to execute the query. %v")
+		panic("Unable to execute the query.")
 	}
 
 	// check how many rows affected

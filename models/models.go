@@ -3,18 +3,56 @@ package models
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
+	"strings"
+	"time"
 )
 
-// DayRoster ...
+// DayRoster - format for database
 type DayRoster struct {
-	ID            int    `json:"id"`
-	Date          string `json:"date"`
-	UpperStaff    string `json:"upperStaff,omitempty"`
-	UpperTime     string `json:"upperTime,omitempty"`
-	LowerStaff    string `json:"lowerStaff,omitempty"`
-	LowerTime     string `json:"lowerTime,omitempty"`
-	CustomMessage string `json:"customMessage,omitempty"`
+	ID            int        `json:"id"`
+	Date          CustomTime `json:"date"`
+	UpperStaff    string     `json:"upperStaff,omitempty"`
+	UpperTime     string     `json:"upperTime,omitempty"`
+	LowerStaff    string     `json:"lowerStaff,omitempty"`
+	LowerTime     string     `json:"lowerTime,omitempty"`
+	CustomMessage string     `json:"customMessage,omitempty"`
 }
+
+// CustomTime - defined
+type CustomTime time.Time
+
+const ctLayout = "2006-01-02 15:04:05 Z07:00"
+
+// UnmarshalJSON Parses the json string in the custom format
+func (ct *CustomTime) UnmarshalJSON(b []byte) (err error) {
+	s := strings.Trim(string(b), `"`)
+	cs := s + ` 00:00:00 Z`
+	fmt.Println(cs, "CustomTime")
+	nt, err := time.Parse(ctLayout, cs)
+	fmt.Println(nt, "NewTime", err)
+	*ct = CustomTime(nt)
+	return
+}
+
+// MarshalJSON writes a quoted string in the custom format
+func (ct CustomTime) MarshalJSON() ([]byte, error) {
+	return []byte(ct.Time().String()), nil
+}
+
+// Time returns the time in the custom format
+func (ct *CustomTime) Time() time.Time {
+	t := time.Time(*ct)
+	return t
+}
+
+// Make it as string
+/*
+func (ct *CustomTime) Time() time.Time {
+	t := time.Time(*ct)
+	return t
+}
+*/
 
 // Product model for cashier
 type Product struct {
