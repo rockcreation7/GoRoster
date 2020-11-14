@@ -16,8 +16,5 @@
  
 *.log
 .env
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
 tmp
+.notes

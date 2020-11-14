@@ -16,7 +16,7 @@ import (
 	// package used to covert string into int type
 	// used to get the params from the route
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/rockcreation7/fiber/v2"
 )
 
 type response struct {
@@ -55,6 +55,8 @@ func GetAllRoster(c *fiber.Ctx) error {
 	if err != nil {
 		panic("Unable to get all roster . %v")
 	}
+
+	fmt.Println(rosters, "Rosters")
 
 	/* 	sort.SliceStable(rosters, func(i, j int) bool {
 		fmt.Println(rosters[i].Date.String(), "sort")

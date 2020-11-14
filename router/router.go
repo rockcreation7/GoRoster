@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"roster-api/middleware"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/rockcreation7/fiber/v2"
 )
 
 // Route export to main

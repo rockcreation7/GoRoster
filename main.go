@@ -7,11 +7,11 @@ import (
 	"roster-api/db"
 	"roster-api/router"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/gofiber/fiber/v2/middleware/recover"
 	_ "github.com/lib/pq"
+	"github.com/rockcreation7/fiber/v2"
+	"github.com/rockcreation7/fiber/v2/middleware/cors"
+	"github.com/rockcreation7/fiber/v2/middleware/logger"
+	"github.com/rockcreation7/fiber/v2/middleware/recover"
 )
 
 func main() {
@@ -25,8 +25,8 @@ func main() {
 
 	app := fiber.New()
 	app.Use(logger.New())
-	app.Use(recover.New())
 
+	app.Use(recover.New())
 	app.Use(cors.New())
 
 	router.Route(app)

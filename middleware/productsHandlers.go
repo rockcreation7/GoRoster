@@ -12,7 +12,7 @@ import (
 	"roster-api/db"
 	"roster-api/models"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/rockcreation7/fiber/v2"
 	// package used to covert string into int type
 	// used to get the params from the route
 )
